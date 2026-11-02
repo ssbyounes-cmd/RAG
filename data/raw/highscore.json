@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "players": {
+    "younes": {
+      "name": "younes",
+      "best_score": 94.93,
+      "games_played": 1,
+      "last_played": "2026-11-01T23:44:49",
+      "best_level_accuracy": [
+        83.78,
+        100.0,
+        96.34
+      ],
+      "best_wpm": 36.0,
+      "best_date": "2026-11-01T23:44:49"
+    }
+  }
+}

@@ -1,12 +1,14 @@
 import bm25s
+import src.index
 
 # 1. Prepare your data blocks
-corpus = [
-    "a cat is a feline and likes to purr",
-    "a dog is the human's best friend and loves to play",
-    "a bird is a beautiful animal that can fly",
-]
-query = "does the fish purr like a cat?"
+# corpus = [
+#     "a cat is a feline and likes to purr",
+#     "a dog is the human's best friend and loves to play",
+#     "a bird is a beautiful animal that can fly",
+# ]
+corpus = src.index.result
+query = "Why is typing essential for developers?"
 
 # 2. Tokenize the text. 
 corpus_tokens = bm25s.tokenize(corpus)
