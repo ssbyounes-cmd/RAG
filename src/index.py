@@ -1,4 +1,4 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
+from langchain_text_splitters import RecursiveCharacterTextSplitter, Language, MarkdownTextSplitter
 
 # 1. Prepare some sample markdown content
 with open("data/raw/INFO.md", "r") as f:

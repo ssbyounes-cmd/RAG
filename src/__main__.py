@@ -1,5 +1,5 @@
 import bm25s
-import src.index
+import src.parser
 
 # 1. Prepare your data blocks
 # corpus = [
@@ -7,17 +7,18 @@ import src.index
 #     "a dog is the human's best friend and loves to play",
 #     "a bird is a beautiful animal that can fly",
 # ]
-corpus = src.index.result
-query = "Why is typing essential for developers?"
+corpus = src.parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
+query = "What is the class responsible for handling input?"
+chunks = [chunk for chunk_list in corpus.values() for chunk in chunk_list]  # Flatten the list of chunks from all files into a single list
 
 # 2. Tokenize the text. 
-corpus_tokens = bm25s.tokenize(corpus)
+corpus_tokens = bm25s.tokenize(chunks)  # Tokenizing the chunks of text in the corpus
 query_tokens = bm25s.tokenize(query)
 
 
 # 3. Create the BM25 model 
 # You can customize the scoring algorithm by supplying a method argument, e.g. method="lucene" or method="bm25l"
-retriever = bm25s.BM25(corpus=corpus) # Initializing
+retriever = bm25s.BM25(corpus=chunks) # Initializing
 
 # 4. Compute and index the matrices
 retriever.index(corpus_tokens) # calculates the global Inverse Document Frequency (IDF) weights, and saves them into the retriever object's memory
@@ -34,6 +35,8 @@ docs, scores = retriever.retrieve(query_tokens, k=2) # Calculating TF and the Fi
 # Eventually we're gonna have all chunks with a certain score,, we retrieve top k
 
 print(f"Top match: {docs[0, 0]} with score {scores[0, 0]:.2f}")
+
+print(f"\n\nSecond match: {docs[0, 1]} with score {scores[0, 1]:.2f}")
 
 
 
