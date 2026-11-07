@@ -1,5 +1,6 @@
 import bm25s
 import src.parser
+import json
 
 # 1. Prepare your data blocks
 # corpus = [
@@ -7,6 +8,25 @@ import src.parser
 #     "a dog is the human's best friend and loves to play",
 #     "a bird is a beautiful animal that can fly",
 # ]
+
+
+# supposedly we already have a saved up bm25 index.
+retriever = bm25s.BM25.load("data/processed/")  # Load the index from disk for later use
+with open("data/processed/corpus.jsonl", "r") as f:
+    content = [json.loads(line) for line in f]
+    
+retriever.corpus = [item["text"] for item in content]  # Load the corpus from the saved JSONL file
+query = "What is the class responsible for handling input?"
+query_tokens = bm25s.tokenize(query)
+docs, scores = retriever.retrieve(query_tokens, k=2)
+print(f"Top match: {docs[0, 0]} with score {scores[0, 0]:.2f}")
+print(f"\n\nSecond match: {docs[0, 1]} with score {scores[0, 1]:.2f}")
+exit(0)
+
+
+
+
+
 corpus = src.parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
 query = "What is the class responsible for handling input?"
 chunks = [chunk for chunk_list in corpus.values() for chunk in chunk_list]  # Flatten the list of chunks from all files into a single list
@@ -26,7 +46,7 @@ retriever.index(corpus_tokens) # calculates the global Inverse Document Frequenc
 
 # 5. Query the index
 
-
+retriever.save("data/processed/") # Saving the index to disk for later use
 
 # Retrieve the top k results (k=2 here)
 docs, scores = retriever.retrieve(query_tokens, k=2) # Calculating TF and the Final Score
