@@ -1,13 +1,15 @@
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter, Language, MarkdownTextSplitter
+from src.models import MinimalSource
+from typing import Any
+import json
 
 
 def parse_files(files_path):
     files = Path(files_path)
-    Chunks: dict[str, list[str]] = {}
+    register: list[dict[str, Any]] = []
     for file in files.rglob("*"):
         if file.suffix in [".md", ".txt", ".py"]:
-            file_content = file.read_text(encoding="utf-8", errors="ignore")
             # Split the file content into chunks
             if file.suffix in [".md", ".txt"]:
                 splitter = MarkdownTextSplitter(chunk_size=1000, chunk_overlap=0)
@@ -15,7 +17,33 @@ def parse_files(files_path):
                 splitter = RecursiveCharacterTextSplitter.from_language(
                     language=Language.PYTHON, chunk_size=1000, chunk_overlap=0
                 )
-            chunks = splitter.create_documents([file_content])
-            Chunks[file.name] = [chunk.page_content.strip() for chunk in chunks]
-    return Chunks
+            register.extend(chunk_file(file, splitter))
+
+    with open("data/processed/chunks.json", "w") as f:
+        json.dump([{"text": chunk["text"], "source": chunk["source"].model_dump()} for chunk in register], f, indent=4)
+    return register
+
+
+def chunk_file(file: Path, splitter:RecursiveCharacterTextSplitter
+                | MarkdownTextSplitter) -> list[dict[str, Any]]:
+    file_content = file.read_text(encoding="utf-8", errors="ignore")
+    chunks = splitter.create_documents([file_content])
+    file_chunks: list[dict[str, Any]] = []
+    last_idx = 0
+    for chunk in chunks:
+        first_idx = file_content.find(chunk.page_content.strip(), last_idx)
+        if first_idx == -1:
+            first_idx = last_idx
+        last_idx = first_idx + len(chunk.page_content)
+        source = MinimalSource(
+            file_path=str(file),
+              first_character_index=first_idx,
+                last_character_index=last_idx)
+        file_chunks.append({"text": chunk.page_content.strip(), "source": source})
+
+    return file_chunks
+
+
+
+
 

@@ -2,43 +2,38 @@ import bm25s
 import src.parser
 import json
 
-# 1. Prepare your data blocks
-# corpus = [
-#     "a cat is a feline and likes to purr",
-#     "a dog is the human's best friend and loves to play",
-#     "a bird is a beautiful animal that can fly",
-# ]
 
+
+query = "Which class is responsible for handling input?"
 
 # supposedly we already have a saved up bm25 index.
-retriever = bm25s.BM25.load("data/processed/")  # Load the index from disk for later use
-with open("data/processed/corpus.jsonl", "r") as f:
-    content = [json.loads(line) for line in f]
+# retriever = bm25s.BM25.load("data/processed/")  # Load the index from disk for later use
+# with open("data/processed/corpus.jsonl", "r") as f:
+#     content = [json.loads(line) for line in f]
     
-retriever.corpus = [item["text"] for item in content]  # Load the corpus from the saved JSONL file
-query = "What is the class responsible for handling input?"
-query_tokens = bm25s.tokenize(query)
-docs, scores = retriever.retrieve(query_tokens, k=2)
-print(f"Top match: {docs[0, 0]} with score {scores[0, 0]:.2f}")
-print(f"\n\nSecond match: {docs[0, 1]} with score {scores[0, 1]:.2f}")
-exit(0)
+# retriever.corpus = [item["text"] for item in content]  # Load the corpus from the saved JSONL file
+# query = "What is the class responsible for handling input?"
+# query_tokens = bm25s.tokenize(query)
+# docs, scores = retriever.retrieve(query_tokens, k=2)
+# print(f"Top match: {docs[0, 0]} with score {scores[0, 0]:.2f}")
+# print(f"\n\nSecond match: {docs[0, 1]} with score {scores[0, 1]:.2f}")
+# exit(0)
 
 
 
 
 
 corpus = src.parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
-query = "What is the class responsible for handling input?"
-chunks = [chunk for chunk_list in corpus.values() for chunk in chunk_list]  # Flatten the list of chunks from all files into a single list
+all_chunks = [chunk["text"] for chunk in corpus]
 
 # 2. Tokenize the text. 
-corpus_tokens = bm25s.tokenize(chunks)  # Tokenizing the chunks of text in the corpus
+corpus_tokens = bm25s.tokenize(all_chunks)  # Tokenizing the chunks of text in the corpus
 query_tokens = bm25s.tokenize(query)
 
 
 # 3. Create the BM25 model 
 # You can customize the scoring algorithm by supplying a method argument, e.g. method="lucene" or method="bm25l"
-retriever = bm25s.BM25(corpus=chunks) # Initializing
+retriever = bm25s.BM25(corpus=all_chunks) # Initializing
 
 # 4. Compute and index the matrices
 retriever.index(corpus_tokens) # calculates the global Inverse Document Frequency (IDF) weights, and saves them into the retriever object's memory
@@ -46,7 +41,7 @@ retriever.index(corpus_tokens) # calculates the global Inverse Document Frequenc
 
 # 5. Query the index
 
-retriever.save("data/processed/") # Saving the index to disk for later use
+# retriever.save("data/processed/") # Saving the index to disk for later use
 
 # Retrieve the top k results (k=2 here)
 docs, scores = retriever.retrieve(query_tokens, k=2) # Calculating TF and the Final Score
