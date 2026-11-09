@@ -3,6 +3,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter, Language, M
 from src.models import MinimalSource
 from typing import Any
 import json
+import os
 
 
 def parse_files(files_path):
@@ -19,6 +20,7 @@ def parse_files(files_path):
                 )
             register.extend(chunk_file(file, splitter))
 
+    os.makedirs("data/processed", exist_ok=True)
     with open("data/processed/chunks.json", "w") as f:
         json.dump([{"text": chunk["text"], "source": chunk["source"].model_dump()} for chunk in register], f, indent=4)
     return register
