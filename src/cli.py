@@ -1,5 +1,6 @@
 import bm25s
 from src.index import build_index
+from src.search import search
 
 
 class CLI:
@@ -11,4 +12,7 @@ class CLI:
     def search(self, query, k):
         """
         Searches the indexed text files for the specified query and returns the top k results."""
-        pass
+        result = search(query, k)
+        print(f"Top {k} results for query '{query}':")
+        for idx, item in enumerate(result):
+            print(f"{idx + 1}. Path: {item['path']}, First ID: {item['first_id']}, Last ID: {item['last_id']}")

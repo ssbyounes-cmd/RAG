@@ -1,8 +1,9 @@
 import bm25s
-import src.parser
+import parser
+import json
 
 
-query = "Which class is responsible for handling input?"
+query = "fastest typer in the word"
 
 # supposedly we already have a saved up bm25 index.
 # retriever = bm25s.BM25.load("data/processed/")  # Load the index from disk for later use
@@ -21,7 +22,7 @@ query = "Which class is responsible for handling input?"
 
 
 
-corpus = src.parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
+corpus = parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
 all_chunks = [chunk["text"] for chunk in corpus]
 
 # 2. Tokenize the text. 
