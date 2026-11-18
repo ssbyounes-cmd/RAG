@@ -1,24 +1,48 @@
 import bm25s
-import json
-from src.models import MinimalSource
-from src.models import MinimalSearchResults
+import json, os
+from src.models import MinimalSource, RagDataset
+from src.models import AnsweredQuestion, UnansweredQuestion, MinimalSearchResults, StudentSearchResults
 
-def search(query: str, k: int):
-    with open("data/processed/chunks.json", "r", encoding="utf-8") as f:
-        json_data = json.load(f)
-    # lst_chunks = [chunk["text"] for chunk in json_data]
-    retriever = bm25s.BM25.load("data/processed", load_corpus=False)
-    # retriever.corpus = lst_chunks
-    query_tokens = bm25s.tokenize(query)
+
+
+# loading indexed data and creating the retriever
+with open("data/processed/chunks.json", "r", encoding="utf-8") as f:
+    json_data = json.load(f)
+retriever = bm25s.BM25.load("data/processed", load_corpus=False)
+
+
+
+
+def search(query: str, k: int) -> list[MinimalSource]:
+
+    query_tokens = bm25s.tokenize([query])
     docs, _ = retriever.retrieve(query_tokens, k=k)
-    
+
     # Create a list of the top k search results
-    topk: list[dict] = []
+    topk: list[MinimalSource] = []
     for chunk_id in docs[0]:
         matched_chunk = json_data[chunk_id]
         source = MinimalSource(**matched_chunk["source"])
-
-        topk.append({"path": source.file_path, "first_id": source.first_character_index, "last_id": source.last_character_index})
-    # We need to retrieve the indices of the chunks as well from the saved up chunks.json
+        topk.append(source)
 
     return topk
+
+
+def search_data(queries: str, k: int, output: str):
+    with open(queries, "r") as f:
+        all_query = json.load(f)
+    ragsets = RagDataset(**all_query)
+    results: list[MinimalSearchResults] = []
+    for query in ragsets.rag_questions:
+        question_id = query.question_id
+        question = query.question
+        minsrc = search(question, k)
+        results.append(MinimalSearchResults(question_id=question_id, question=question, retrieved_sources=minsrc))
+
+
+    os.makedirs(output, exist_ok=True)
+
+    with open(output + "search_results.json", "w") as f:
+        json.dump(StudentSearchResults(search_results=results, k=k).model_dump(), f, indent=4)
+
+

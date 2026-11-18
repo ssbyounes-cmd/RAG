@@ -31,7 +31,7 @@ def chunk_file(file: Path, splitter:RecursiveCharacterTextSplitter
     file_chunks: list[dict[str, Any]] = []
     last_idx = 0
     for chunk in chunks:
-        first_idx = file_content.find(chunk.page_content.strip(), last_idx)
+        first_idx = file_content.find(chunk.page_content.strip(), last_idx)  # lt = 0 // f = file_content.find(chunk.page_content.strip())  lt = f + len(chunk.page_content)
         if first_idx == -1:
             first_idx = last_idx
         last_idx = first_idx + len(chunk.page_content)

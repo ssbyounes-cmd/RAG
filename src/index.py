@@ -3,6 +3,8 @@ import bm25s
 import json
 import os
 
+
+
 def build_index(max_chunk_size):
     corpus = parse_files("data/raw", max_chunk_size)  # Parsing the files in the specified path and creating a corpus of text chunks
     all_chunks = [chunk["text"] for chunk in corpus]

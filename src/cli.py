@@ -1,10 +1,11 @@
 import bm25s
 from src.index import build_index
-from src.search import search
+from src.search import search, search_data
+from src.models import MinimalSource
 
 
 class CLI:
-    def index(self, max_chunk_size: int = 1000):
+    def index(self, max_chunk_size: int = 2000):
         """
         Indexes the text files in the specified path using the BM25 algorithm and saves the index to disk."""
         build_index(max_chunk_size)
@@ -15,4 +16,7 @@ class CLI:
         result = search(query, k)
         print(f"Top {k} results for query '{query}':")
         for idx, item in enumerate(result):
-            print(f"{idx + 1}. Path: {item['path']}, First ID: {item['first_id']}, Last ID: {item['last_id']}")
+            print(f"{idx + 1}. Path: {item.file_path}, First ID: {item.first_character_index}, Last ID: {item.last_character_index}")
+
+    def search_datasets(self, queries: str, k: int, output: str):
+        search_data(queries, k, output)

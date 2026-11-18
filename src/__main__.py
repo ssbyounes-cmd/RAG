@@ -9,6 +9,6 @@ def main():
 
 if __name__ == "__main__":
     # try:
-        main()
+    main()
     # except Exception as e:
     #     print(f"An error occurred: {e}")

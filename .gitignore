@@ -13,3 +13,4 @@ wheels/
 
 # Just for quick accessing (going to be ignored whole later)
 vllm-0.10.1/
+data/processed/
