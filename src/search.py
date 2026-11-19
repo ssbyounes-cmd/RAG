@@ -2,7 +2,7 @@ import bm25s
 import json, os
 from src.models import MinimalSource, RagDataset
 from src.models import AnsweredQuestion, UnansweredQuestion, MinimalSearchResults, StudentSearchResults
-
+from src.index import prep
 
 
 # loading indexed data and creating the retriever
@@ -13,9 +13,11 @@ def load_index():
 
 
 
-def search(query: str, k: int, retriever=load_index()) -> list[MinimalSource]:
+def search(query: str, k: int, retriever=None) -> list[MinimalSource]:
+    if retriever is None:
+        retriever = load_index()
 
-    query_tokens = bm25s.tokenize([query], stopwords="en")
+    query_tokens = bm25s.tokenize([prep(query)], stopwords="en")
     docs, _ = retriever.retrieve(query_tokens, k=k)
 
     # Create a list of the top k search results
@@ -44,5 +46,3 @@ def search_data(queries: str, k: int, output: str):
 
     with open(output + "search_results.json", "w") as f:
         json.dump(StudentSearchResults(search_results=results, k=k).model_dump(), f, indent=4)
-
-

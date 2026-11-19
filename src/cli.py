@@ -18,5 +18,5 @@ class CLI:
         for idx, item in enumerate(result):
             print(f"{idx + 1}. Path: {item.file_path}, First ID: {item.first_character_index}, Last ID: {item.last_character_index}")
 
-    def search_datasets(self, queries: str, k: int, output: str):
+    def search_dataset(self, queries: str, k: int, output: str):
         search_data(queries, k, output)

@@ -2,12 +2,17 @@ from src.parser import parse_files
 import bm25s
 import json
 import os
+import re
 
+def prep(text: str) -> str:
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)  # camelCase -> camel Case
+    text = text.replace("_", " ")                          # snake_case -> snake case
+    return text
 
 
 def build_index(max_chunk_size):
     corpus = parse_files("data/raw", max_chunk_size)  # Parsing the files in the specified path and creating a corpus of text chunks
-    all_chunks = [chunk["text"] for chunk in corpus]
+    all_chunks = [prep(chunk["text"]) for chunk in corpus] # [prep(c["source"].file_path + " " + c["text"]) for c in corpus]
     corpus_tokens = bm25s.tokenize(all_chunks, show_progress=True, stopwords="en")  # Tokenizing the chunks of text in the corpus
     retriever = bm25s.BM25(corpus=corpus)
     retriever.index(corpus_tokens)
