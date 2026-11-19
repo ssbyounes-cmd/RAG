@@ -666,9 +666,9 @@
                     "last_character_index": 5975
                 },
                 {
-                    "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/models/skyworkr1v.py",
-                    "first_character_index": 9819,
-                    "last_character_index": 11708
+                    "file_path": "data/raw/vllm-0.10.1/vllm/model_executor/models/internvl.py",
+                    "first_character_index": 11874,
+                    "last_character_index": 13759
                 }
             ]
         },

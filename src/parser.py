@@ -39,7 +39,7 @@ def chunk_file(file: Path, splitter:RecursiveCharacterTextSplitter
             file_path=str(file),
               first_character_index=first_idx,
                 last_character_index=last_idx)
-        file_chunks.append({"text": chunk.page_content.strip(), "source": source})
+        file_chunks.append({"source": source.model_dump(), "text": chunk.page_content.strip()})
 
     return file_chunks
 

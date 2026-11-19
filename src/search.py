@@ -6,29 +6,29 @@ from src.models import AnsweredQuestion, UnansweredQuestion, MinimalSearchResult
 
 
 # loading indexed data and creating the retriever
-with open("data/processed/chunks.json", "r", encoding="utf-8") as f:
-    json_data = json.load(f)
-retriever = bm25s.BM25.load("data/processed", load_corpus=False)
+
+def load_index():
+    return bm25s.BM25.load("data/processed", load_corpus=True)
 
 
 
 
-def search(query: str, k: int) -> list[MinimalSource]:
+def search(query: str, k: int, retriever=load_index()) -> list[MinimalSource]:
 
-    query_tokens = bm25s.tokenize([query])
+    query_tokens = bm25s.tokenize([query], stopwords="en")
     docs, _ = retriever.retrieve(query_tokens, k=k)
 
     # Create a list of the top k search results
     topk: list[MinimalSource] = []
-    for chunk_id in docs[0]:
-        matched_chunk = json_data[chunk_id]
-        source = MinimalSource(**matched_chunk["source"])
+    for chunk in docs[0]:
+        source = MinimalSource(**chunk["source"])
         topk.append(source)
 
     return topk
 
 
 def search_data(queries: str, k: int, output: str):
+    retreiver = load_index()
     with open(queries, "r") as f:
         all_query = json.load(f)
     ragsets = RagDataset(**all_query)
@@ -36,7 +36,7 @@ def search_data(queries: str, k: int, output: str):
     for query in ragsets.rag_questions:
         question_id = query.question_id
         question = query.question
-        minsrc = search(question, k)
+        minsrc = search(question, k, retreiver)
         results.append(MinimalSearchResults(question_id=question_id, question=question, retrieved_sources=minsrc))
 
 
