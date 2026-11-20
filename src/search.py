@@ -4,7 +4,6 @@ from src.models import MinimalSource, RagDataset
 from src.models import AnsweredQuestion, UnansweredQuestion, MinimalSearchResults, StudentSearchResults
 from src.index import prep
 
-
 # loading indexed data and creating the retriever
 
 def load_index():
@@ -29,9 +28,9 @@ def search(query: str, k: int, retriever=None) -> list[MinimalSource]:
     return topk
 
 
-def search_data(queries: str, k: int, output: str):
+def search_data(dataset_path: str, k: int, save_directory: str):
     retreiver = load_index()
-    with open(queries, "r") as f:
+    with open(dataset_path, "r") as f:
         all_query = json.load(f)
     ragsets = RagDataset(**all_query)
     results: list[MinimalSearchResults] = []
@@ -42,7 +41,7 @@ def search_data(queries: str, k: int, output: str):
         results.append(MinimalSearchResults(question_id=question_id, question=question, retrieved_sources=minsrc))
 
 
-    os.makedirs(output, exist_ok=True)
+    os.makedirs(save_directory, exist_ok=True)
 
-    with open(output + "search_results.json", "w") as f:
+    with open(save_directory + "search_results.json", "w") as f:
         json.dump(StudentSearchResults(search_results=results, k=k).model_dump(), f, indent=4)
