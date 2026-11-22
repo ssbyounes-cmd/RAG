@@ -1,31 +1,42 @@
-static_chunk = []
 
-def chunk_text(text: str, max: int, sep: list[str], id: int=0) -> list[str]:
-    # having no separators inside text will just lead to infitite recursion
-    if all(x not in content for x in sep):
-        return text
-    # print(all(x not in text for x in sep))
-    # exit(0)
+class splitter_text:
+    @staticmethod
+    def textmd_chunker(text: str, seps: list[str], max: int) -> list[str]:
+        result = []
+        for sep in seps:
+            chunks = text.split(sep)
+            if all(len(chunk) <= max for chunk in chunks):
+                sep_check = text.startswith(sep)
+                break
 
-    if sep[id] in text:
-        prev, after = text[:text.index(sep[id])], text[text.index(sep[id]):]
-        text = after
-        # in case we just begin chunking and there is a whole lot of comments top file
-        if all(s not in prev for s in sep):
-            if len(prev) > max:
-                prev = prev[:max]
-            static_chunk.append(prev)
-    if len(text) > max:
-        id += 1
-    else:
-        static_chunk.append(text)
+        chunks = [c if (i == 0 and not sep_check) else sep + c for i, c in enumerate(chunks)]
 
-    if text.strip():
-        chunk_text(text, max, id)
+        for chunk in chunks:
+            if result and len(chunk + result[-1]) <= max:
+                result[-1] = result[-1] + chunk
+            else:
+                result.append(chunk)
+
+        return result
+        
 
 
-with open("type.py", "r") as f:
-    content = f.read()
 
-chunk_text(content, 200, ["\nclass ", "\ndef ", "\n\n", "\n", " "])
-    
+
+# with open("INFO.md", "r") as f:
+#     content = f.read()
+
+# res = splitter_text.textmd_chunker(content, [
+#                 "\n#{1,6} ",
+#                 "```\n",
+#                 "\n\\*\\*\\*+\n",
+#                 "\n---+\n",
+#                 "\n___+\n",
+#                 "\n\n",
+#                 "\n",
+#                 " "
+#             ], 1000)
+
+# for i, x in enumerate(res):
+#     print(f"CHUNK {i}:\n{x}")
+#     print("\n.........................................................................\n")
