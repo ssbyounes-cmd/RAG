@@ -29,18 +29,10 @@ def chunk_file(file: Path, splitter: MarkdownTextSplitter | RecursiveCharacterTe
     except OSError:
         return []
     
-    if type(splitter) != splitter_python:
+    if type(splitter) == splitter_text:
         # chunks = splitter.create_documents([file_content])
-        chunks = splitter.textmd_chunker(file_content, [
-                "\n#{1,6} ",
-                "```\n",
-                "\n\\*\\*\\*+\n",
-                "\n---+\n",
-                "\n___+\n",
-                "\n\n",
-                "\n",
-                " "
-            ], 2000)
+        seps = ["\n#{1,6} ", "```\n", "\n\\*\\*\\*+\n", "\n---+\n", "\n___+\n", "\n\n", "\n", " "]
+        chunks = splitter.textmd_chunker(file_content, seps, 2000)
     else:
         seps = ["\nclass ", "\ndef ", "\n\tdef ", "\n\n", "\n", " ", ""]
         chunks = splitter.chunker(file_content, seps, 2000)

@@ -1,3 +1,5 @@
+from src.chunk2 import splitter_python as force_split
+
 
 class splitter_text:
     @staticmethod
@@ -17,8 +19,18 @@ class splitter_text:
             else:
                 result.append(chunk)
 
+
+        # force slicing with max if necessary and overwrite result
+        if any(len(chunk) > max for chunk in chunks):
+            result = []
+            for chunk in chunks:
+                if len(chunk) > max:
+                    result.extend(force_split.chunk_max(chunk, max))
+                else:
+                    result.append(chunk)
+
         return result
-        
+
 
 
 

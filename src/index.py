@@ -7,7 +7,7 @@ import re
 
 # only apply for code files
 def prep(text: str) -> str:
-    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)  # camelCase -> camel Case
+    # text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)  # camelCase -> camel Case
     text = text.replace("_", " ")                          # snake_case -> snake case
     return text
 
