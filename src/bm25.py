@@ -1,3 +1,5 @@
+import re
+
 STOPWORDS = {
     "the", "a", "an", "is", "in", "it", "of", "and", "to", "for", 
     "with", "on", "as", "by", "this", "that", "are", "be", "or", 
@@ -6,12 +8,41 @@ STOPWORDS = {
 
 
 def tokenize(text: str) -> list[str]:
-    text = text.replace("_", " ")
-    tokens = [word for word in text.split() if word not in STOPWORDS]
+    words = re.findall(r"[a-zA-Z0-9_]{2,}", text.lower()) # r"[a-zA-Z0-9_]+" splitting by -> one or more consecutive words until none are found, r"[a-zA-Z0-9_]{2,}" two or more consecutive words until none are found
+    tokens = [word for word in words if word not in STOPWORDS]
     return tokens
 
-def index(tokens: list):
-    ...
+def index(chunks: list[dict]):
+    inverse_index = {}
+    docs_length = {}
+
+    all_docs = len(chunks)
+
+    for i, chunk in enumerate(chunks):
+        tokenized = tokenize(chunk["text"])
+        docs_length[f"chunk_{i}"] = len(tokenized)
+        for token in tokenized:
+            if token not in inverse_index:
+                inverse_index[token] = {}
+            if f"chunk_{i}" not in inverse_index[token]:
+                inverse_index[token][f"chunk_{i}"] = 1
+            else:
+                inverse_index[token][f"chunk_{i}"] += 1
+
+    # 2. Calculate Average Document Length (avgdl)
+    # in order to calcu this,, we need len() of each document / all_docs
+    avgdl = sum(doc_len for doc_len in docs_length.values()) / all_docs
+
+
+    # 3. Calculate Inverse Document Frequency (IDF) for each token
+    idf = {}
+    # print(avgdl)
+
+  
+    exit(0)
+
+
+        
 
 
 

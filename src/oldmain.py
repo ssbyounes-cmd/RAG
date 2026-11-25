@@ -1,9 +1,9 @@
 import bm25s
-import parser
+import src.parser as parser
 import json
 
 
-query = "fastest typer in the word"
+query = "def main_mos(chunks: list[dict], count: int):\n if count > 25:\n   for chunk in chunks:\n  chunk[count] = "" ?![]{ |}/@..,*+-^"" y 0 1 F1 0P 0. P." 
 
 # supposedly we already have a saved up bm25 index.
 # retriever = bm25s.BM25.load("data/processed/")  # Load the index from disk for later use
@@ -20,13 +20,13 @@ query = "fastest typer in the word"
 
 
 
-
-
 corpus = parser.parse_files("data/raw")  # This is a dictionary of file names and their corresponding chunks
 all_chunks = [chunk["text"] for chunk in corpus]
 
 # 2. Tokenize the text. 
-corpus_tokens = bm25s.tokenize(all_chunks)  # Tokenizing the chunks of text in the corpus
+corpus_tokens = bm25s.tokenize(query)  # Tokenizing the chunks of text in the corpus
+print(corpus_tokens[1])
+exit(0)
 query_tokens = bm25s.tokenize(query)
 
 

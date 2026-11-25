@@ -2,7 +2,7 @@ from src.parser import parse_files
 import bm25s
 import json
 import os
-import re
+from src.bm25 import index
 
 
 # only apply for code files
@@ -14,6 +14,10 @@ def prep(text: str) -> str:
 
 def build_index(max_chunk_size):
     corpus = parse_files("data/raw", max_chunk_size)  # Parsing the files in the specified path and creating a corpus of text chunks
+    index(corpus)
+
+
+
     all_chunks = [prep(chunk["text"]) for chunk in corpus]
     corpus_tokens = bm25s.tokenize(all_chunks, show_progress=True, stopwords="en")  # Tokenizing the chunks of text in the corpus
     retriever = bm25s.BM25(corpus=corpus)
@@ -21,5 +25,5 @@ def build_index(max_chunk_size):
     retriever.save("data/processed/")
 
     os.makedirs("data/processed", exist_ok=True)
-    # with open("data/processed/chunks.json", "w") as f:
-    #    json.dump([{"text": chunk["text"], "source": chunk["source"].model_dump()} for chunk in corpus], f, indent=4)
+    with open("data/processed/chunks.json", "w") as f:
+       json.dump([{"text": chunk["text"], "source": chunk["source"]} for chunk in corpus], f, indent=4)
