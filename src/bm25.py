@@ -1,6 +1,10 @@
 import re
 import math
 
+import bm25s
+
+bm25s.BM25.retrieve()
+
 STOPWORDS = {
     "the", "a", "an", "is", "in", "it", "of", "and", "to", "for", 
     "with", "on", "as", "by", "this", "that", "are", "be", "or", 
@@ -58,6 +62,7 @@ def retreive(query: str, k: int, bm25_index: dict):
     tokenized_q = tokenize(query)
     scores = {}
     k1, b = 1.5, 0.75
+    avgdl = bm25_index["avgdl"]
     for token in tokenized_q:
         if token not in bm25_index["inverse_index"]:
             continue
@@ -65,13 +70,15 @@ def retreive(query: str, k: int, bm25_index: dict):
         token_idf = bm25_index["idf"][token]
 
         # For each token in query:
-        # We acquire its IDF and multiply it by its term Frequency of a chunk
+        # We acquire its IDF
         # We retrieve all chunks where the token was mentioned on.
-        # LAST TIME I WAS HERE..................... FIXING SCORES TBH
+        # For each chunk we count its score based on the token IDF * (token frequency on the chunk)
+        # The score of the chunk can increase if other tokens in query are also mentioned in the same chunk
 
 
         for chunk, freq in chunks_freq.items():
-            score = token_idf * ((freq * (k1 + 1)) / freq + k1 * (1 - b + b*(bm25_index["docs_length"][chunk]/bm25_index["avgdl"])))
+            chunk_len = bm25_index["docs_length"][chunk]
+            score = token_idf * ((freq * (k1 + 1)) / (freq + k1 * (1 - b + b*(chunk_len/avgdl))))
             if chunk not in scores:
                 scores[chunk] = score
             else:
